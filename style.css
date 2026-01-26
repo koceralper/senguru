@@ -117,7 +117,7 @@ header .container {
 /* Hero Section */
 .hero {
     height: 100vh;
-    background-image: url('https://images.unsplash.com/photo-1674066253665-4d2553a3bcb8?fm=jpg&q=80&w=1920&fit=crop'); /* Mixed Dried Fruits & Nuts */
+    background-image: url('images/header.png'); /* Mixed Dried Fruits & Nuts */
     background-size: cover;
     background-position: center;
     position: relative;
