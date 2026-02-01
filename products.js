@@ -12,9 +12,8 @@ const products = [
         badge: "Popüler",
         isActive: true,
         options: [
-            { weight: "50 Gr", price: 60 },
-            { weight: "100 Gr", price: 100 },
-            { weight: "250 Gr", price: 240 }
+            { weight: "50 Gr", price: 55 },
+            { weight: "100 Gr", price: 100 }
         ]
     },
     {
@@ -25,9 +24,8 @@ const products = [
         badge: "",
         isActive: true,
         options: [
-            { weight: "50 Gr", price: 60 },
-            { weight: "100 Gr", price: 100 },
-            { weight: "250 Gr", price: 240 }
+            { weight: "50 Gr", price: 105 },
+            { weight: "100 Gr", price: 200 }
         ]
     },
     {
@@ -38,9 +36,8 @@ const products = [
         badge: "",
         isActive: true,
         options: [
-            { weight: "50 Gr", price: 60 },
-            { weight: "100 Gr", price: 100 },
-            { weight: "250 Gr", price: 240 }
+            { weight: "50 Gr", price: 130 },
+            { weight: "100 Gr", price: 250}
         ]
     },
     {
@@ -51,9 +48,8 @@ const products = [
         badge: "Yeni",
         isActive: true,
         options: [
-            { weight: "50 Gr", price: 60 },
-            { weight: "100 Gr", price: 100 },
-            { weight: "250 Gr", price: 240 }
+            { weight: "50 Gr", price: 135 },
+            { weight: "100 Gr", price: 250 }
         ]
     },
     {
@@ -62,7 +58,7 @@ const products = [
         image: "images/hepsi.png",
         description: "Portakal, elma, limon ve hurmanın enfes uyumu bir arada.",
         badge: "Özel",
-        isActive: true,
+        isActive: false,
         options: [
             { weight: "50 Gr", price: 60 },
             { weight: "100 Gr", price: 100 },
@@ -77,9 +73,8 @@ const products = [
         badge: "Yeni",
         isActive: true,
         options: [
-            { weight: "50 Gr", price: 60 },
-            { weight: "100 Gr", price: 100 },
-            { weight: "250 Gr", price: 240 }
+            { weight: "50 Gr", price: 160 },
+            { weight: "100 Gr", price: 300 }
         ]
     }
 ];
