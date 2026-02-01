@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Announcement Bar Logic ---
     const announcementText = document.getElementById('announcement-text');
     if (announcementText && typeof storeConfig !== 'undefined') {
-        announcementText.innerText = `${storeConfig.freeShippingThreshold} TL ve üzeri siparişlerde Kargo Ücretsiz!`;
+        announcementText.innerHTML = `<i class="fas fa-shipping-fast"></i> &nbsp; ${storeConfig.freeShippingThreshold} TL ve üzeri siparişlerde Kargo Ücretsiz! &nbsp; <i class="fas fa-gift"></i>`;
     }
 
     // --- New Shop Logic ---
