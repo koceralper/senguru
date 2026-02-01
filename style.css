@@ -219,9 +219,9 @@ header .container {
 }
 
 .btn-primary:hover {
-    background-color: transparent;
+    background-color: var(--white);
     border-color: var(--white);
-    color: var(--white);
+    color: var(--primary-color);
 }
 
 .btn-outline {
