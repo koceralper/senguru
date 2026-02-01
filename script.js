@@ -51,21 +51,25 @@ function initShop() {
     if (!productList) return;
 
     // Render Products
-    productList.innerHTML = products.map(product => `
-        <div class="product-card">
+    productList.innerHTML = products.map(product => {
+        // Find 100 Gr option to show as default price if exists, else first option
+        const displayOption = product.options.find(o => o.weight === "100 Gr") || product.options[0];
+
+        return `
+        <div class="product-card" data-id="${product.id}">
             <div class="product-image">
                 <img src="${product.image}" alt="${product.title}">
                 ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
             </div>
             <div class="product-info">
                 <h3>${product.title}</h3>
-                <p class="product-weight">${product.weight}</p>
-                <div class="product-price">${product.price} TL</div>
+                <div class="product-price">${displayOption.price} TL <span class="price-hint">(${displayOption.weight})</span></div>
                 <p class="product-desc">${product.description}</p>
-                <button class="btn-product" onclick="addToCart(${product.id}, this)">Sepete Ekle</button>
+                <button class="btn-product" onclick="openVariantModal(${product.id})">Sepete Ekle</button>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 
     // Cart Event Listeners
     const cartBtn = document.getElementById('cart-btn');
@@ -98,57 +102,95 @@ function initShop() {
     }
 }
 
-// Global functions for inline onclicks
-window.addToCart = function(productId, btnElement) {
+// Variant Modal Logic
+window.openVariantModal = function(productId) {
     const product = products.find(p => p.id === productId);
-    const existingItem = cart.find(item => item.id === productId);
+    const modal = document.getElementById('variant-modal');
+    const content = document.getElementById('variant-modal-content');
+
+    if(!modal || !content) return;
+
+    // Generate HTML for the modal
+    const optionsHtml = product.options.map((opt, index) => `
+        <button class="variant-btn" onclick="selectVariantAndAdd(${product.id}, ${index})">
+            <span class="v-weight">${opt.weight}</span>
+            <span class="v-price">${opt.price} TL</span>
+        </button>
+    `).join('');
+
+    content.innerHTML = `
+        <div class="vm-header">
+            <h3>${product.title}</h3>
+            <span class="close-variant" onclick="closeVariantModal()"><i class="fas fa-times"></i></span>
+        </div>
+        <div class="vm-body">
+            <p>Lütfen paket ağırlığını seçiniz:</p>
+            <div class="variant-grid">
+                ${optionsHtml}
+            </div>
+        </div>
+    `;
+
+    modal.classList.add('active');
+};
+
+window.closeVariantModal = function() {
+    const modal = document.getElementById('variant-modal');
+    if(modal) modal.classList.remove('active');
+};
+
+window.selectVariantAndAdd = function(productId, optionIndex) {
+    const product = products.find(p => p.id === productId);
+    const selectedOption = product.options[optionIndex];
+
+    // Create a unique ID for cart item based on product + variant
+    const cartItemId = `${product.id}-${optionIndex}`;
+
+    const existingItem = cart.find(item => item.cartId === cartItemId);
 
     if (existingItem) {
         existingItem.quantity++;
     } else {
-        cart.push({ ...product, quantity: 1 });
+        cart.push({
+            cartId: cartItemId,
+            id: product.id,
+            title: product.title,
+            image: product.image,
+            price: selectedOption.price,
+            weight: selectedOption.weight,
+            quantity: 1
+        });
     }
 
     updateCartUI();
+    closeVariantModal();
 
-    // Simple visual feedback
-    const btn = btnElement || document.querySelector(`button[onclick="addToCart(${productId}, this)"]`);
-    if(btn) {
-        const originalText = btn.innerText;
-        btn.innerText = "Eklendi!";
-        btn.style.backgroundColor = "#2ecc71"; // Green
-        btn.style.borderColor = "#2ecc71";
-        btn.style.color = "#fff";
-        setTimeout(() => {
-            btn.innerText = originalText;
-            btn.style.backgroundColor = "";
-            btn.style.borderColor = "";
-            btn.style.color = "";
-        }, 1000);
-    }
+    // Open cart automatically to show success (optional, but good UX)
+    const cartBtn = document.getElementById('cart-btn');
+    if(cartBtn) cartBtn.click();
 };
 
-window.removeFromCart = function(productId) {
-    cart = cart.filter(item => item.id !== productId);
+window.removeFromCart = function(cartItemId) {
+    cart = cart.filter(item => item.cartId !== cartItemId);
     updateCartUI();
 };
 
-window.increaseQuantity = function(productId) {
-    const item = cart.find(item => item.id === productId);
+window.increaseQuantity = function(cartItemId) {
+    const item = cart.find(item => item.cartId === cartItemId);
     if (item) {
         item.quantity++;
         updateCartUI();
     }
 };
 
-window.decreaseQuantity = function(productId) {
-    const item = cart.find(item => item.id === productId);
+window.decreaseQuantity = function(cartItemId) {
+    const item = cart.find(item => item.cartId === cartItemId);
     if (item) {
         if (item.quantity > 1) {
             item.quantity--;
             updateCartUI();
         } else {
-            removeFromCart(productId);
+            removeFromCart(cartItemId);
         }
     }
 };
@@ -179,14 +221,14 @@ function updateCartUI() {
                     <h4>${item.title} <span class="cart-item-weight">(${item.weight})</span></h4>
                     <div class="cart-item-controls">
                         <div class="quantity-controls">
-                            <button class="qty-btn" onclick="decreaseQuantity(${item.id})"><i class="fas fa-minus"></i></button>
+                            <button class="qty-btn" onclick="decreaseQuantity('${item.cartId}')"><i class="fas fa-minus"></i></button>
                             <span class="qty-text">${item.quantity}</span>
-                            <button class="qty-btn" onclick="increaseQuantity(${item.id})"><i class="fas fa-plus"></i></button>
+                            <button class="qty-btn" onclick="increaseQuantity('${item.cartId}')"><i class="fas fa-plus"></i></button>
                         </div>
                         <p class="price-calc">${item.quantity} x ${item.price} TL = <strong>${itemTotal} TL</strong></p>
                     </div>
                 </div>
-                <button class="remove-btn" onclick="removeFromCart(${item.id})"><i class="fas fa-trash"></i></button>
+                <button class="remove-btn" onclick="removeFromCart('${item.cartId}')"><i class="fas fa-trash"></i></button>
             </div>
         `;
     }).join('');
