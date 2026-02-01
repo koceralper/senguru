@@ -39,6 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Announcement Bar Logic ---
+    const announcementText = document.getElementById('announcement-text');
+    if (announcementText && typeof storeConfig !== 'undefined') {
+        announcementText.innerHTML = `🚚 Tüm Türkiye'ye Kargo ${storeConfig.shippingCost} TL &nbsp;|&nbsp; 🎁 ${storeConfig.freeShippingThreshold} TL ve üzeri siparişlerde KARGO BEDAVA 🎁`;
+    }
+
     // --- New Shop Logic ---
     initShop();
 });
@@ -55,17 +61,25 @@ function initShop() {
         // Find 100 Gr option to show as default price if exists, else first option
         const displayOption = product.options.find(o => o.weight === "100 Gr") || product.options[0];
 
+        // Stock Check
+        const isOutOfStock = product.isActive === false;
+        const stockClass = isOutOfStock ? 'out-of-stock' : '';
+        const btnText = isOutOfStock ? 'Tükendi' : 'Sepete Ekle';
+        const btnAction = isOutOfStock ? '' : `onclick="openVariantModal(${product.id})"`;
+        const btnDisabled = isOutOfStock ? 'disabled' : '';
+
         return `
-        <div class="product-card" data-id="${product.id}">
+        <div class="product-card ${stockClass}" data-id="${product.id}">
             <div class="product-image">
                 <img src="${product.image}" alt="${product.title}">
-                ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
+                ${product.badge && !isOutOfStock ? `<div class="product-badge">${product.badge}</div>` : ''}
+                ${isOutOfStock ? `<div class="product-badge badge-stock">Tükendi</div>` : ''}
             </div>
             <div class="product-info">
                 <h3>${product.title}</h3>
                 <div class="product-price">${displayOption.price} TL <span class="price-hint">(${displayOption.weight})</span></div>
                 <p class="product-desc">${product.description}</p>
-                <button class="btn-product" onclick="openVariantModal(${product.id})">Sepete Ekle</button>
+                <button class="btn-product" ${btnAction} ${btnDisabled}>${btnText}</button>
             </div>
         </div>
         `;
@@ -211,10 +225,10 @@ function updateCartUI() {
         return;
     }
 
-    let total = 0;
+    let subtotal = 0;
     cartItemsContainer.innerHTML = cart.map(item => {
         const itemTotal = item.price * item.quantity;
-        total += itemTotal;
+        subtotal += itemTotal;
         return `
             <div class="cart-item">
                 <div class="cart-item-info">
@@ -233,7 +247,19 @@ function updateCartUI() {
         `;
     }).join('');
 
-    cartTotalPrice.innerText = `${total} TL`;
+    // Shipping Logic
+    let shippingCost = storeConfig.shippingCost;
+    if (subtotal >= storeConfig.freeShippingThreshold) {
+        shippingCost = 0;
+    }
+
+    const grandTotal = subtotal + shippingCost;
+
+    cartTotalPrice.innerHTML = `
+        <div style="font-size: 0.9rem; font-weight: 400; color: #666;">Ara Toplam: ${subtotal} TL</div>
+        <div style="font-size: 0.9rem; font-weight: 400; color: #666;">Kargo: ${shippingCost === 0 ? 'Ücretsiz' : shippingCost + ' TL'}</div>
+        <div style="margin-top: 5px; color: var(--primary-color);">Toplam: ${grandTotal} TL</div>
+    `;
 }
 
 function checkout() {
@@ -243,15 +269,24 @@ function checkout() {
     }
 
     let message = "Merhaba, Instagram üzerinden sipariş vermek istiyorum:\n\n";
-    let total = 0;
+    let subtotal = 0;
 
     cart.forEach(item => {
         const itemTotal = item.price * item.quantity;
-        total += itemTotal;
+        subtotal += itemTotal;
         message += `- ${item.title} (${item.weight}): ${item.quantity} Adet - ${itemTotal} TL\n`;
     });
 
-    message += `\nTOPLAM: ${total} TL\n\nAdres ve İletişim bilgilerim: ...`;
+    // Shipping Logic for Checkout
+    let shippingCost = storeConfig.shippingCost;
+    if (subtotal >= storeConfig.freeShippingThreshold) {
+        shippingCost = 0;
+    }
+    const grandTotal = subtotal + shippingCost;
+
+    message += `\nAra Toplam: ${subtotal} TL\n`;
+    message += `Kargo: ${shippingCost === 0 ? 'Ücretsiz' : shippingCost + ' TL'}\n`;
+    message += `GENEL TOPLAM: ${grandTotal} TL\n\nAdres ve İletişim bilgilerim: ...`;
 
     // Copy to Clipboard
     navigator.clipboard.writeText(message).then(() => {
