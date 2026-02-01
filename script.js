@@ -42,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Announcement Bar Logic ---
     const announcementText = document.getElementById('announcement-text');
     if (announcementText && typeof storeConfig !== 'undefined') {
-        announcementText.innerHTML = `<i class="fas fa-shipping-fast"></i> &nbsp; ${storeConfig.freeShippingThreshold} TL ve üzeri siparişlerde Kargo Ücretsiz! &nbsp; <i class="fas fa-gift"></i>`;
+        announcementText.innerHTML = `🚚 Tüm Türkiye'ye Kargo ${storeConfig.shippingCost} TL &nbsp;|&nbsp; 🎁 ${storeConfig.freeShippingThreshold} TL ve üzeri siparişlerde KARGO BEDAVA 🎁`;
     }
 
     // --- New Shop Logic ---
@@ -61,17 +61,25 @@ function initShop() {
         // Find 100 Gr option to show as default price if exists, else first option
         const displayOption = product.options.find(o => o.weight === "100 Gr") || product.options[0];
 
+        // Stock Check
+        const isOutOfStock = product.isActive === false;
+        const stockClass = isOutOfStock ? 'out-of-stock' : '';
+        const btnText = isOutOfStock ? 'Tükendi' : 'Sepete Ekle';
+        const btnAction = isOutOfStock ? '' : `onclick="openVariantModal(${product.id})"`;
+        const btnDisabled = isOutOfStock ? 'disabled' : '';
+
         return `
-        <div class="product-card" data-id="${product.id}">
+        <div class="product-card ${stockClass}" data-id="${product.id}">
             <div class="product-image">
                 <img src="${product.image}" alt="${product.title}">
-                ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
+                ${product.badge && !isOutOfStock ? `<div class="product-badge">${product.badge}</div>` : ''}
+                ${isOutOfStock ? `<div class="product-badge badge-stock">Tükendi</div>` : ''}
             </div>
             <div class="product-info">
                 <h3>${product.title}</h3>
                 <div class="product-price">${displayOption.price} TL <span class="price-hint">(${displayOption.weight})</span></div>
                 <p class="product-desc">${product.description}</p>
-                <button class="btn-product" onclick="openVariantModal(${product.id})">Sepete Ekle</button>
+                <button class="btn-product" ${btnAction} ${btnDisabled}>${btnText}</button>
             </div>
         </div>
         `;

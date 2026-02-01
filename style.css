@@ -404,6 +404,11 @@ header .container {
     font-weight: 600;
 }
 
+.badge-stock {
+    background-color: #7f8c8d;
+    z-index: 2;
+}
+
 .product-info {
     padding: 25px;
 }
@@ -585,6 +590,28 @@ header .container {
 .btn-product:hover {
     background-color: var(--secondary-color);
     color: var(--white);
+}
+
+/* Out of Stock Styles */
+.product-card.out-of-stock {
+    opacity: 0.8;
+}
+
+.product-card.out-of-stock .product-image img {
+    filter: grayscale(100%);
+}
+
+.btn-product[disabled] {
+    border-color: #ccc;
+    color: #999;
+    cursor: not-allowed;
+    background-color: transparent;
+}
+
+.btn-product[disabled]:hover {
+    background-color: transparent;
+    color: #999;
+    border-color: #ccc;
 }
 
 /* Footer */

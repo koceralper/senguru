@@ -52,11 +52,26 @@ Mevcut bir ürün bloğunu (süslü parantezden süslü paranteze kadar) kopyala
     *   *Not: Görsel dosyasını `images` klasörüne atmayı unutmayın.*
 4.  **description:** Kısa açıklama.
 5.  **badge:** "Yeni", "Popüler" gibi etiketler. İstemiyorsanız boş bırakın `""`.
-6.  **options:** Gramaj ve fiyat seçenekleri.
+6.  **isActive:** Ürün stok durumu. `true` (var) veya `false` (yok).
+7.  **options:** Gramaj ve fiyat seçenekleri.
 
 ---
 
-## 3. Görsel Yüklemek
+## 3. Ürün Stok Durumunu Değiştirmek (Tükendi)
+
+Bir ürün tükendiğinde, o ürünü silmek yerine "Tükendi" olarak işaretleyebilirsiniz.
+
+1.  `products.js` dosyasında ilgili ürünü bulun.
+2.  `isActive: true` satırını `isActive: false` yapın.
+
+Sonuç:
+*   Ürün resmi grileşir.
+*   Üzerinde "Tükendi" yazar.
+*   Buton tıklanamaz hale gelir.
+
+---
+
+## 4. Görsel Yüklemek
 
 Yeni bir ürün görseli ekleyecekseniz:
 
