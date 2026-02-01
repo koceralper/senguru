@@ -113,74 +113,8 @@
                 <p class="section-desc">Mevsiminde toplanan en taze meyveler, Şenguru farkıyla kurutuluyor.</p>
             </div>
 
-            <div class="products-grid">
-                <!-- Product 1 -->
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="images/portakal.png" alt="Portakal Cipsi">
-                        <div class="product-badge">Popüler</div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Portakal Cipsi</h3>
-                        <p class="product-weight">100 Gr</p>
-                        <p class="product-desc">Kabuğuyla birlikte dilimlenmiş, C vitamini deposu kıtır lezzet.</p>
-                        <a href="https://wa.me/905000000000" target="_blank" class="btn-product">Bilgi Al & Sipariş</a>
-                    </div>
-                </div>
-
-                <!-- Product 2 -->
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="images/elma.png" alt="Kuru Elma">
-                    </div>
-                    <div class="product-info">
-                        <h3>Kuru Elma</h3>
-                        <p class="product-weight">100 Gr</p>
-                        <p class="product-desc">Mevsimin en tatlı elmaları, ince ince dilimlenip çıtır hale getirildi.</p>
-                        <a href="https://wa.me/905000000000" target="_blank" class="btn-product">Bilgi Al & Sipariş</a>
-                    </div>
-                </div>
-
-                <!-- Product 3 -->
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="images/limon.png" alt="Kuru Limon">
-                    </div>
-                    <div class="product-info">
-                        <h3>Kuru Limon</h3>
-                        <p class="product-weight">100 Gr</p>
-                        <p class="product-desc">Aromasıyla çaylarınıza ve sularınıza tazelik katan, kabuklu limon dilimleri.</p>
-                        <a href="https://wa.me/905000000000" target="_blank" class="btn-product">Bilgi Al & Sipariş</a>
-                    </div>
-                </div>
-
-                <!-- Product 4 -->
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="images/cennet_hurmasi.png" alt="Cennet Hurması">
-                        <div class="product-badge">Yeni</div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Cennet Hurması</h3>
-                        <p class="product-weight">100 Gr</p>
-                        <p class="product-desc">Doğal şeker kaynağı, yumuşak dokusuyla enerji veren eşsiz lezzet.</p>
-                        <a href="https://wa.me/905000000000" target="_blank" class="btn-product">Bilgi Al & Sipariş</a>
-                    </div>
-                </div>
-
-                <!-- Product 5 -->
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="images/hepsi.png" alt="Karışık Meyve Paketi">
-                        <div class="product-badge">Özel</div>
-                    </div>
-                    <div class="product-info">
-                        <h3>Karışık Meyve Paketi</h3>
-                        <p class="product-weight">100 Gr</p>
-                        <p class="product-desc">Portakal, elma, limon ve hurmanın enfes uyumu bir arada.</p>
-                        <a href="https://wa.me/905000000000" target="_blank" class="btn-product">Bilgi Al & Sipariş</a>
-                    </div>
-                </div>
+            <div class="products-grid" id="product-list">
+                <!-- Products will be dynamically inserted here via JS -->
             </div>
 
             <div class="text-center" style="margin-top: 50px;">
@@ -227,6 +161,33 @@
         </div>
     </footer>
 
+    <!-- Shopping Cart Button -->
+    <div id="cart-btn" class="cart-btn">
+        <i class="fas fa-shopping-basket"></i>
+        <span id="cart-count">0</span>
+    </div>
+
+    <!-- Shopping Cart Modal -->
+    <div id="cart-modal" class="cart-modal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h3>Sepetim</h3>
+                <span class="close-cart"><i class="fas fa-times"></i></span>
+            </div>
+            <div id="cart-items" class="cart-items">
+                <!-- Cart items will be injected here -->
+            </div>
+            <div class="cart-footer">
+                <div class="cart-total">
+                    <span>Toplam:</span>
+                    <span id="cart-total-price">0 TL</span>
+                </div>
+                <button id="checkout-btn" class="btn btn-primary btn-block">Sipariş Ver (Instagram)</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="products.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
