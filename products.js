@@ -1,3 +1,8 @@
+const storeConfig = {
+    freeShippingThreshold: 2500,
+    shippingCost: 125
+};
+
 const products = [
     {
         id: 1,

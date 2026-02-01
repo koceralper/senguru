@@ -39,6 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Announcement Bar Logic ---
+    const announcementText = document.getElementById('announcement-text');
+    if (announcementText && typeof storeConfig !== 'undefined') {
+        announcementText.innerText = `${storeConfig.freeShippingThreshold} TL ve üzeri siparişlerde Kargo Ücretsiz!`;
+    }
+
     // --- New Shop Logic ---
     initShop();
 });
@@ -211,10 +217,10 @@ function updateCartUI() {
         return;
     }
 
-    let total = 0;
+    let subtotal = 0;
     cartItemsContainer.innerHTML = cart.map(item => {
         const itemTotal = item.price * item.quantity;
-        total += itemTotal;
+        subtotal += itemTotal;
         return `
             <div class="cart-item">
                 <div class="cart-item-info">
@@ -233,7 +239,19 @@ function updateCartUI() {
         `;
     }).join('');
 
-    cartTotalPrice.innerText = `${total} TL`;
+    // Shipping Logic
+    let shippingCost = storeConfig.shippingCost;
+    if (subtotal >= storeConfig.freeShippingThreshold) {
+        shippingCost = 0;
+    }
+
+    const grandTotal = subtotal + shippingCost;
+
+    cartTotalPrice.innerHTML = `
+        <div style="font-size: 0.9rem; font-weight: 400; color: #666;">Ara Toplam: ${subtotal} TL</div>
+        <div style="font-size: 0.9rem; font-weight: 400; color: #666;">Kargo: ${shippingCost === 0 ? 'Ücretsiz' : shippingCost + ' TL'}</div>
+        <div style="margin-top: 5px; color: var(--primary-color);">Toplam: ${grandTotal} TL</div>
+    `;
 }
 
 function checkout() {
@@ -243,15 +261,24 @@ function checkout() {
     }
 
     let message = "Merhaba, Instagram üzerinden sipariş vermek istiyorum:\n\n";
-    let total = 0;
+    let subtotal = 0;
 
     cart.forEach(item => {
         const itemTotal = item.price * item.quantity;
-        total += itemTotal;
+        subtotal += itemTotal;
         message += `- ${item.title} (${item.weight}): ${item.quantity} Adet - ${itemTotal} TL\n`;
     });
 
-    message += `\nTOPLAM: ${total} TL\n\nAdres ve İletişim bilgilerim: ...`;
+    // Shipping Logic for Checkout
+    let shippingCost = storeConfig.shippingCost;
+    if (subtotal >= storeConfig.freeShippingThreshold) {
+        shippingCost = 0;
+    }
+    const grandTotal = subtotal + shippingCost;
+
+    message += `\nAra Toplam: ${subtotal} TL\n`;
+    message += `Kargo: ${shippingCost === 0 ? 'Ücretsiz' : shippingCost + ' TL'}\n`;
+    message += `GENEL TOPLAM: ${grandTotal} TL\n\nAdres ve İletişim bilgilerim: ...`;
 
     // Copy to Clipboard
     navigator.clipboard.writeText(message).then(() => {
