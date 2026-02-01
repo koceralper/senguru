@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://www.senguru.com.tr/sitemap.xml
