@@ -61,7 +61,7 @@ const products = [
         isActive: false,
         options: [
             { weight: "50 Gr", price: 60 },
-            { weight: "100 Gr", price: 100 },
+            { weight: "100 Gr", price: 000 },
             { weight: "250 Gr", price: 240 }
         ]
     },
