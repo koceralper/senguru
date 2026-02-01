@@ -386,6 +386,31 @@ header .container {
     font-weight: 600;
 }
 
+/* Variant Selector */
+.variant-selector {
+    margin-bottom: 1rem;
+}
+
+.variant-selector select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.variant-selector select:hover,
+.variant-selector select:focus {
+    border-color: var(--secondary-color);
+    outline: none;
+    background-color: var(--white);
+}
+
 /* New Product Price Style */
 .product-price {
     font-size: 1.25rem;

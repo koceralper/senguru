@@ -51,21 +51,37 @@ function initShop() {
     if (!productList) return;
 
     // Render Products
-    productList.innerHTML = products.map(product => `
-        <div class="product-card">
+    productList.innerHTML = products.map(product => {
+        // Default to first option
+        const defaultOption = product.options[0];
+
+        // Generate options HTML
+        const optionsHtml = product.options.map((opt, index) =>
+            `<option value="${index}">${opt.weight}</option>`
+        ).join('');
+
+        return `
+        <div class="product-card" data-id="${product.id}">
             <div class="product-image">
                 <img src="${product.image}" alt="${product.title}">
                 ${product.badge ? `<div class="product-badge">${product.badge}</div>` : ''}
             </div>
             <div class="product-info">
                 <h3>${product.title}</h3>
-                <p class="product-weight">${product.weight}</p>
-                <div class="product-price">${product.price} TL</div>
+                <div class="product-price" id="price-${product.id}">${defaultOption.price} TL</div>
+
+                <div class="variant-selector">
+                    <select onchange="updatePrice(${product.id}, this.value)">
+                        ${optionsHtml}
+                    </select>
+                </div>
+
                 <p class="product-desc">${product.description}</p>
                 <button class="btn-product" onclick="addToCart(${product.id}, this)">Sepete Ekle</button>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 
     // Cart Event Listeners
     const cartBtn = document.getElementById('cart-btn');
@@ -99,14 +115,48 @@ function initShop() {
 }
 
 // Global functions for inline onclicks
+window.updatePrice = function(productId, optionIndex) {
+    const product = products.find(p => p.id === productId);
+    const option = product.options[optionIndex];
+    const priceEl = document.getElementById(`price-${productId}`);
+    if(priceEl) {
+        priceEl.innerText = `${option.price} TL`;
+    }
+    // Store selected option index on the card for addToCart to read
+    const card = document.querySelector(`.product-card[data-id="${productId}"]`);
+    if(card) {
+        card.setAttribute('data-selected-option', optionIndex);
+    }
+};
+
 window.addToCart = function(productId, btnElement) {
     const product = products.find(p => p.id === productId);
-    const existingItem = cart.find(item => item.id === productId);
+
+    // Get selected option
+    const card = document.querySelector(`.product-card[data-id="${productId}"]`);
+    let selectedIndex = 0;
+    if (card && card.hasAttribute('data-selected-option')) {
+        selectedIndex = parseInt(card.getAttribute('data-selected-option'));
+    }
+    const selectedOption = product.options[selectedIndex];
+
+    // Create a unique ID for cart item based on product + variant
+    const cartItemId = `${product.id}-${selectedIndex}`;
+
+    const existingItem = cart.find(item => item.cartId === cartItemId);
 
     if (existingItem) {
         existingItem.quantity++;
     } else {
-        cart.push({ ...product, quantity: 1 });
+        cart.push({
+            cartId: cartItemId,
+            id: product.id, // Keep original ID for reference if needed
+            title: product.title,
+            image: product.image,
+            price: selectedOption.price,
+            weight: selectedOption.weight,
+            quantity: 1
+        });
     }
 
     updateCartUI();
@@ -128,27 +178,27 @@ window.addToCart = function(productId, btnElement) {
     }
 };
 
-window.removeFromCart = function(productId) {
-    cart = cart.filter(item => item.id !== productId);
+window.removeFromCart = function(cartItemId) {
+    cart = cart.filter(item => item.cartId !== cartItemId);
     updateCartUI();
 };
 
-window.increaseQuantity = function(productId) {
-    const item = cart.find(item => item.id === productId);
+window.increaseQuantity = function(cartItemId) {
+    const item = cart.find(item => item.cartId === cartItemId);
     if (item) {
         item.quantity++;
         updateCartUI();
     }
 };
 
-window.decreaseQuantity = function(productId) {
-    const item = cart.find(item => item.id === productId);
+window.decreaseQuantity = function(cartItemId) {
+    const item = cart.find(item => item.cartId === cartItemId);
     if (item) {
         if (item.quantity > 1) {
             item.quantity--;
             updateCartUI();
         } else {
-            removeFromCart(productId);
+            removeFromCart(cartItemId);
         }
     }
 };
@@ -179,14 +229,14 @@ function updateCartUI() {
                     <h4>${item.title} <span class="cart-item-weight">(${item.weight})</span></h4>
                     <div class="cart-item-controls">
                         <div class="quantity-controls">
-                            <button class="qty-btn" onclick="decreaseQuantity(${item.id})"><i class="fas fa-minus"></i></button>
+                            <button class="qty-btn" onclick="decreaseQuantity('${item.cartId}')"><i class="fas fa-minus"></i></button>
                             <span class="qty-text">${item.quantity}</span>
-                            <button class="qty-btn" onclick="increaseQuantity(${item.id})"><i class="fas fa-plus"></i></button>
+                            <button class="qty-btn" onclick="increaseQuantity('${item.cartId}')"><i class="fas fa-plus"></i></button>
                         </div>
                         <p class="price-calc">${item.quantity} x ${item.price} TL = <strong>${itemTotal} TL</strong></p>
                     </div>
                 </div>
-                <button class="remove-btn" onclick="removeFromCart(${item.id})"><i class="fas fa-trash"></i></button>
+                <button class="remove-btn" onclick="removeFromCart('${item.cartId}')"><i class="fas fa-trash"></i></button>
             </div>
         `;
     }).join('');
