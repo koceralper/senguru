@@ -711,13 +711,64 @@ header.scrolled {
 
 .cart-item-info h4 {
     font-size: 1rem;
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.5rem;
     color: var(--text-color);
 }
 
-.cart-item-info p {
+.cart-item-weight {
+    font-size: 0.85rem;
+    color: #95a5a6;
+    font-weight: 400;
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    padding: 2px 8px;
+}
+
+.qty-btn {
+    background: none;
+    border: none;
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 0.8rem;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.qty-btn:hover {
+    color: var(--primary-color);
+}
+
+.qty-text {
+    font-weight: 700;
+    font-size: 0.9rem;
+    min-width: 15px;
+    text-align: center;
+}
+
+.price-calc {
     font-size: 0.9rem;
     color: #7f8c8d;
+}
+
+.price-calc strong {
+    color: var(--primary-color);
 }
 
 .remove-btn {
@@ -728,6 +779,7 @@ header.scrolled {
     font-size: 1.1rem;
     padding: 5px;
     transition: transform 0.2s;
+    margin-left: 10px;
 }
 
 .remove-btn:hover {

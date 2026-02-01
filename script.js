@@ -133,6 +133,26 @@ window.removeFromCart = function(productId) {
     updateCartUI();
 };
 
+window.increaseQuantity = function(productId) {
+    const item = cart.find(item => item.id === productId);
+    if (item) {
+        item.quantity++;
+        updateCartUI();
+    }
+};
+
+window.decreaseQuantity = function(productId) {
+    const item = cart.find(item => item.id === productId);
+    if (item) {
+        if (item.quantity > 1) {
+            item.quantity--;
+            updateCartUI();
+        } else {
+            removeFromCart(productId);
+        }
+    }
+};
+
 function updateCartUI() {
     const cartCount = document.getElementById('cart-count');
     const cartItemsContainer = document.getElementById('cart-items');
@@ -156,8 +176,15 @@ function updateCartUI() {
         return `
             <div class="cart-item">
                 <div class="cart-item-info">
-                    <h4>${item.title}</h4>
-                    <p>${item.price} TL x ${item.quantity} = ${itemTotal} TL</p>
+                    <h4>${item.title} <span class="cart-item-weight">(${item.weight})</span></h4>
+                    <div class="cart-item-controls">
+                        <div class="quantity-controls">
+                            <button class="qty-btn" onclick="decreaseQuantity(${item.id})"><i class="fas fa-minus"></i></button>
+                            <span class="qty-text">${item.quantity}</span>
+                            <button class="qty-btn" onclick="increaseQuantity(${item.id})"><i class="fas fa-plus"></i></button>
+                        </div>
+                        <p class="price-calc">${item.quantity} x ${item.price} TL = <strong>${itemTotal} TL</strong></p>
+                    </div>
                 </div>
                 <button class="remove-btn" onclick="removeFromCart(${item.id})"><i class="fas fa-trash"></i></button>
             </div>
