@@ -52,13 +52,8 @@ function initShop() {
 
     // Render Products
     productList.innerHTML = products.map(product => {
-        // Default to first option
-        const defaultOption = product.options[0];
-
-        // Generate options HTML
-        const optionsHtml = product.options.map((opt, index) =>
-            `<option value="${index}">${opt.weight}</option>`
-        ).join('');
+        // Find 100 Gr option to show as default price if exists, else first option
+        const displayOption = product.options.find(o => o.weight === "100 Gr") || product.options[0];
 
         return `
         <div class="product-card" data-id="${product.id}">
@@ -68,16 +63,9 @@ function initShop() {
             </div>
             <div class="product-info">
                 <h3>${product.title}</h3>
-                <div class="product-price" id="price-${product.id}">${defaultOption.price} TL</div>
-
-                <div class="variant-selector">
-                    <select onchange="updatePrice(${product.id}, this.value)">
-                        ${optionsHtml}
-                    </select>
-                </div>
-
+                <div class="product-price">${displayOption.price} TL <span class="price-hint">(${displayOption.weight})</span></div>
                 <p class="product-desc">${product.description}</p>
-                <button class="btn-product" onclick="addToCart(${product.id}, this)">Sepete Ekle</button>
+                <button class="btn-product" onclick="openVariantModal(${product.id})">Sepete Ekle</button>
             </div>
         </div>
         `;
@@ -114,34 +102,49 @@ function initShop() {
     }
 }
 
-// Global functions for inline onclicks
-window.updatePrice = function(productId, optionIndex) {
+// Variant Modal Logic
+window.openVariantModal = function(productId) {
     const product = products.find(p => p.id === productId);
-    const option = product.options[optionIndex];
-    const priceEl = document.getElementById(`price-${productId}`);
-    if(priceEl) {
-        priceEl.innerText = `${option.price} TL`;
-    }
-    // Store selected option index on the card for addToCart to read
-    const card = document.querySelector(`.product-card[data-id="${productId}"]`);
-    if(card) {
-        card.setAttribute('data-selected-option', optionIndex);
-    }
+    const modal = document.getElementById('variant-modal');
+    const content = document.getElementById('variant-modal-content');
+
+    if(!modal || !content) return;
+
+    // Generate HTML for the modal
+    const optionsHtml = product.options.map((opt, index) => `
+        <button class="variant-btn" onclick="selectVariantAndAdd(${product.id}, ${index})">
+            <span class="v-weight">${opt.weight}</span>
+            <span class="v-price">${opt.price} TL</span>
+        </button>
+    `).join('');
+
+    content.innerHTML = `
+        <div class="vm-header">
+            <h3>${product.title}</h3>
+            <span class="close-variant" onclick="closeVariantModal()"><i class="fas fa-times"></i></span>
+        </div>
+        <div class="vm-body">
+            <p>Lütfen paket ağırlığını seçiniz:</p>
+            <div class="variant-grid">
+                ${optionsHtml}
+            </div>
+        </div>
+    `;
+
+    modal.classList.add('active');
 };
 
-window.addToCart = function(productId, btnElement) {
-    const product = products.find(p => p.id === productId);
+window.closeVariantModal = function() {
+    const modal = document.getElementById('variant-modal');
+    if(modal) modal.classList.remove('active');
+};
 
-    // Get selected option
-    const card = document.querySelector(`.product-card[data-id="${productId}"]`);
-    let selectedIndex = 0;
-    if (card && card.hasAttribute('data-selected-option')) {
-        selectedIndex = parseInt(card.getAttribute('data-selected-option'));
-    }
-    const selectedOption = product.options[selectedIndex];
+window.selectVariantAndAdd = function(productId, optionIndex) {
+    const product = products.find(p => p.id === productId);
+    const selectedOption = product.options[optionIndex];
 
     // Create a unique ID for cart item based on product + variant
-    const cartItemId = `${product.id}-${selectedIndex}`;
+    const cartItemId = `${product.id}-${optionIndex}`;
 
     const existingItem = cart.find(item => item.cartId === cartItemId);
 
@@ -150,7 +153,7 @@ window.addToCart = function(productId, btnElement) {
     } else {
         cart.push({
             cartId: cartItemId,
-            id: product.id, // Keep original ID for reference if needed
+            id: product.id,
             title: product.title,
             image: product.image,
             price: selectedOption.price,
@@ -160,22 +163,11 @@ window.addToCart = function(productId, btnElement) {
     }
 
     updateCartUI();
+    closeVariantModal();
 
-    // Simple visual feedback
-    const btn = btnElement || document.querySelector(`button[onclick="addToCart(${productId}, this)"]`);
-    if(btn) {
-        const originalText = btn.innerText;
-        btn.innerText = "Eklendi!";
-        btn.style.backgroundColor = "#2ecc71"; // Green
-        btn.style.borderColor = "#2ecc71";
-        btn.style.color = "#fff";
-        setTimeout(() => {
-            btn.innerText = originalText;
-            btn.style.backgroundColor = "";
-            btn.style.borderColor = "";
-            btn.style.color = "";
-        }, 1000);
-    }
+    // Open cart automatically to show success (optional, but good UX)
+    const cartBtn = document.getElementById('cart-btn');
+    if(cartBtn) cartBtn.click();
 };
 
 window.removeFromCart = function(cartItemId) {
